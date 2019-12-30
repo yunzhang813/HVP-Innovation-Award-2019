@@ -1,0 +1,12 @@
+name: "HVP-Innovation-Award-2019"
+output_dir: "docs"
+navbar:
+  title: "Cars"
+  left:
+  - text: "Home"
+    href: index.html
+  - text: "Hello"
+    href: hello.html
+output:
+  html_document:
+theme: cosmo
