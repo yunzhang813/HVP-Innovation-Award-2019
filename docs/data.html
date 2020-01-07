@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Data Prep</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">HVP-Innovation-Award-2019</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="data.html">Data Prep</a>
+</li>
+<li>
+  <a href="bulk.html">Bulk RNA-seq Analysis</a>
+</li>
+<li>
+  <a href="FastMix.html">Deconvolution Analysis by FastMix</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Data Prep</h1>
+
+</div>
+
+
+<p><br></p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>The <strong>goal</strong> of this data preprocessing procedure is to <em>filter and transform</em> the RNA-seq count data of the HVP01 Immunity to Hepatitis B Vaccine study, so that the filtered and transformed data follows approaximately a constinuous normal distribution, which can then be fitted by advanced statistical models, such as the linear mixed-effect regression model, for differential analysis and deconvolution analysis.</p>
+<p>Our general <strong>strategy</strong> of preprocessing RNA-seq count data follows three steps:</p>
+<ol style="list-style-type: decimal">
+<li>Filter low count and low variance genes.</li>
+<li>Choose a data transformation that transforms the count data to some <em>normally</em> distributed data. For RNA-seq, it specifically means to
+<ul>
+<li>transform discrete data to continuous data, and</li>
+<li>stabilize the mean-variance relationship, i.e. mitigate overdispersion.</li>
+</ul></li>
+<li>Plot the filtered and transformed data distribution, and adjust the choices from previous two steps if needed.</li>
+</ol>
+<p>This report is organized in the following sections.</p>
+<ul>
+<li><a href="#DESeq2">A brief recap of DESeq2 data transformations.</a> One naive transformation and two DESeq2 transformation techniques.
+<ul>
+<li>Naive log2-tranformation</li>
+<li>Variance stabilizing transformations (VST)</li>
+<li>Regularized logarithm (rlog)</li>
+</ul></li>
+<li><a href="#original">Original count data.</a> Apply the above three transformations on the original count data. One caveat is that the original count data are slightly filtered by the data provider. However, the data plots show excessive low count genes.</li>
+<li><a href="#filt">Gene filtering.</a> Filter out low count and low variance genes, and apply the three transformations on the filtered data.</li>
+<li><a href="#final">Final preprocessed data.</a> Pick up the best data transformation and save the final data.</li>
+</ul>
+<p>Load useful packages.</p>
+<pre class="r"><code>library(DESeq2)
+library(vsn) #for menaSdPlot</code></pre>
+<p><br></p>
+</div>
+<div id="DESeq2" class="section level2">
+<h2>A brief recap of DESeq2 data transformations</h2>
+<p>Briefly, the <code>DESeq2</code> R package provides two alternative approaches that offer more theoretical justification than the naive log2-transformation on RNA-seq count data. One makes use of the concept of variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010), and the other is the regularized logarithm (rlog), which incorporates a prior on the sample differences (Love, Huber, and Anders 2014). Both transformations produce transformed data on the log2 scale which has been normalized with respect to library size or other normalization factors.</p>
+<p>For more information, please see <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#count-data-transformations">DESeq2 Bioconductor page</a>.</p>
+<p><br></p>
+</div>
+<div id="original" class="section level2">
+<h2>Original count data</h2>
+<p>We obtain the original count data from our data provider in the file “HVP_countMatrix_noGlobin_May18.csv”, which contains filtered counts (genes with &lt;10 counts across 5 samples are removed). These have also had the globin genes removed.</p>
+<pre class="r"><code>mycount &lt;- read.csv(&quot;../HVP_countMatrix_noGlobin_May18.csv&quot;, row.names = 1) 
+ctab &lt;- read.csv(&quot;../HVP_sampleTable_response_May18.csv&quot;)
+dim(mycount)</code></pre>
+<pre><code>## [1] 15026    75</code></pre>
+<p>The original count data has 15026 genes and 75 samples. Next, we build the DESeq2 data object for our count data.</p>
+<pre class="r"><code>## build dds object from count data
+dds &lt;- DESeqDataSetFromMatrix(countData = mycount,
+                              colData = ctab,
+                              design = ~ 1) #for the design formula, check out the &quot;blind=TRUE&quot; option in the transformation step</code></pre>
+<div id="log2-transformation-on-original-count-data" class="section level4">
+<h4>log2-transformation on original count data</h4>
+<pre class="r"><code>## log2-transformation
+ntd &lt;- normTransform(dds)
+mat0 &lt;- assay(ntd)
+hist(rowMeans(mat0), breaks=50)
+meanSdPlot(mat0)</code></pre>
+<p><img src="data_files/figure-html/mycount-ntd-1.png" width="50%" /><img src="data_files/figure-html/mycount-ntd-2.png" width="50%" /></p>
+</div>
+<div id="vst-on-original-count-data" class="section level4">
+<h4>VST on original count data</h4>
+<pre class="r"><code>## vst
+vsd &lt;- vst(dds)
+mat1 &lt;- assay(vsd)
+hist(rowMeans(mat1), breaks=50)
+meanSdPlot(mat1)</code></pre>
+<p><img src="data_files/figure-html/mycount-vsd-1.png" width="50%" /><img src="data_files/figure-html/mycount-vsd-2.png" width="50%" /></p>
+</div>
+<div id="rlog-transformation-on-original-count-data" class="section level4">
+<h4>rlog-transformation on original count data</h4>
+<pre class="r"><code>## rlog
+rld &lt;- rlog(dds)</code></pre>
+<pre><code>## rlog() may take a long time with 50 or more samples,
+## vst() is a much faster transformation</code></pre>
+<pre class="r"><code>mat2 &lt;- assay(rld)
+hist(rowMeans(mat2), breaks=50)
+meanSdPlot(mat2)</code></pre>
+<p><img src="data_files/figure-html/mycount-rld-1.png" width="50%" /><img src="data_files/figure-html/mycount-rld-2.png" width="50%" /></p>
+<p><br></p>
+</div>
+</div>
+<div id="filt" class="section level2">
+<h2>Gene filtering</h2>
+<p>Working with the original data, we observe excessive low count genes. We will further filter the data by removing low count and low variance genes. First, let’s check the per gene mean and standard deviation.</p>
+<pre class="r"><code>## per gene mean count
+gmeans &lt;- rowMeans(mycount)
+summary(gmeans)</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+##     1.17    24.20   104.67   385.77   329.92 39982.93</code></pre>
+<pre class="r"><code>## per gene standard deviation
+gsd &lt;- apply(mycount, 1, sd)
+summary(gsd)</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+##     2.73    14.45    53.76   207.71   168.46 21554.67</code></pre>
+<p>Based on the above, it is reasonable to set the following thresholds for the mean and standard deviation.</p>
+<pre class="r"><code>## set thresholds
+m.thred &lt;- 10
+sd.thred &lt;- 5
+
+## keep high count and high variation genes
+ind.kp &lt;- (gmeans &gt; m.thred) &amp; (gsd &gt; sd.thred)
+
+## filted count data
+mycount.filt &lt;- mycount[ind.kp,]
+dim(mycount.filt)</code></pre>
+<pre><code>## [1] 13169    75</code></pre>
+<p>For data filtering, we remove the genes that have mean count below 10 and standard deviation below 5 across all samples. The filtered data has 13169 genes and 75 samples. Next, we build the DESeq2 data object for the filtered data.</p>
+<pre class="r"><code>## build dds object on the filtered count data
+dds.filt &lt;- DESeqDataSetFromMatrix(countData = mycount.filt,
+                              colData = ctab,
+                              design = ~ 1)</code></pre>
+<div id="log2-transformation-on-filtered-data" class="section level4">
+<h4>log2-transformation on filtered data</h4>
+<pre class="r"><code>## log2-transformation
+ntd.filt &lt;- normTransform(dds.filt)
+mat0.filt &lt;- assay(ntd.filt)
+hist(rowMeans(mat0.filt), breaks=50)
+meanSdPlot(mat0.filt)</code></pre>
+<p><img src="data_files/figure-html/mycount-filt-ntd-1.png" width="50%" /><img src="data_files/figure-html/mycount-filt-ntd-2.png" width="50%" /></p>
+</div>
+<div id="vst-on-filtered-data" class="section level4">
+<h4>VST on filtered data</h4>
+<pre class="r"><code>## vst
+vsd.filt &lt;- vst(dds.filt)
+mat1.filt &lt;- assay(vsd.filt)
+hist(rowMeans(mat1.filt), breaks=50)
+meanSdPlot(mat1.filt)</code></pre>
+<p><img src="data_files/figure-html/mycount-filt-vsd-1.png" width="50%" /><img src="data_files/figure-html/mycount-filt-vsd-2.png" width="50%" /></p>
+</div>
+<div id="rlog-transformation-on-filtered-data" class="section level3">
+<h3>rlog-transformation on filtered data</h3>
+<pre class="r"><code>## rlog
+rld.filt &lt;- rlog(dds.filt)</code></pre>
+<pre><code>## rlog() may take a long time with 50 or more samples,
+## vst() is a much faster transformation</code></pre>
+<pre class="r"><code>mat2.filt &lt;- assay(rld.filt)
+hist(rowMeans(mat2.filt), breaks=50)
+meanSdPlot(mat2.filt)</code></pre>
+<p><img src="data_files/figure-html/mycount-filt-rlog-1.png" width="50%" /><img src="data_files/figure-html/mycount-filt-rlog-2.png" width="50%" /></p>
+<p><br></p>
+</div>
+</div>
+<div id="final" class="section level2">
+<h2>Final preprocessed data</h2>
+<p>We decide to use the <em>rlog</em> transformed data on the filtered data.</p>
+<pre class="r"><code>## rename
+dat.filt10 &lt;- mat2.filt</code></pre>
+<p>The original data use Ensembl gene ids, and we map them to gene symbols using <code>EnsDb.Hsapiens.v86</code>.</p>
+<pre class="r"><code>library(EnsDb.Hsapiens.v86)
+mymap &lt;- select(EnsDb.Hsapiens.v86, key=rownames(dat.filt10), columns=c(&quot;SYMBOL&quot;), keytype=&quot;GENEID&quot;)
+detach(&quot;package:EnsDb.Hsapiens.v86&quot;, unload=TRUE)
+detach(&quot;package:ensembldb&quot;, unload=TRUE)
+
+## the final data only keep the genes that have unique gene symbols
+dat.filt10.symbol &lt;- dat.filt10 %&gt;% as_tibble(rownames = NA) %&gt;% rownames_to_column() %&gt;%
+  right_join(mymap %&gt;% distinct(SYMBOL, .keep_all = TRUE), by = c(&quot;rowname&quot;=&quot;GENEID&quot;)) %&gt;%
+  dplyr::select(-rowname) %&gt;% column_to_rownames(var = &quot;SYMBOL&quot;) %&gt;%
+  as.matrix()</code></pre>
+<p>Finally, we are going to work with <code>dat.filt10.symbol</code>, which has <strong>13157 genes and 75 samples</strong>. After the filtering and data transformation, the following figure shows that <strong>the final data follows a nice close-to-normal distribution, and the variance is stable across the range of mean expression.</strong></p>
+<pre class="r"><code>## combined plot
+g1 &lt;- ggplot(data.frame(&quot;mean&quot;=rowMeans(dat.filt10.symbol)), aes(x=mean)) + 
+  geom_histogram(color=&quot;black&quot;, fill=&quot;white&quot;) + ggtitle(&quot;(a) Histogram of mean expression&quot;)
+g2 &lt;- meanSdPlot(dat.filt10.symbol, plot = FALSE)$gg + ggtitle(&quot;(b) Mean-variance relationship&quot;)
+g &lt;- grid.arrange(g1, g2, nrow=1, widths = c(1, 1.5), top=textGrob(&quot;Preprocessed data of HVP01 study&quot;, gp = gpar(fontface = 2, fontsize = 15)))</code></pre>
+<p><img src="data_files/figure-html/final-plot-1.png" width="1056" /></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

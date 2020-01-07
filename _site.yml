@@ -1,12 +1,16 @@
 name: "HVP-Innovation-Award-2019"
 output_dir: "docs"
 navbar:
-  title: "Cars"
+  title: "HVP-Innovation-Award-2019"
   left:
   - text: "Home"
     href: index.html
-  - text: "Hello"
-    href: hello.html
+  - text: "Data Prep"
+    href: data.html
+  - text: "Bulk RNA-seq Analysis"
+    href: bulk.html
+  - text: "Deconvolution Analysis by FastMix"
+    href: FastMix.html
 output:
   html_document:
-theme: cosmo
+    theme: cosmo

@@ -1,5 +1,26 @@
 ---
-title: "index"
+title: "HVP Innovation Award 2019"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+author: 
+  - name: Yun (Renee) Zhang
+    email: zhangy@jcvi.org
+  - name: Aishwarya Mandava
+    email: amandava@jcvi.org
+  - name: Yu (Max) Qian
+    email: mqian@jcvi.org
 ---
 
-## Index
+<br>
+
+## The Project
+
+<br>
+
+We will be using the following auxiliary packages to generate this set of reports.
+```{r package, message=FALSE, warning=FALSE, catch=FALSE}
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(gridExtra)
+library(grid)
+```

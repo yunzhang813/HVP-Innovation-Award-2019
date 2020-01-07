@@ -1,0 +1,92 @@
+---
+title: "Deconvolution Anlaysis by `FastMix`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+<br>
+
+## Overview
+
+The __goal__ of this analysis
+
+Load useful packages.
+```{r package, message=FALSE, warning=FALSE, catch=FALSE}
+library(FastMix)
+library(ReactomePA)
+```
+
+<br>
+
+## Model fitting: Responder_dose2, Age {#WModel4} 
+
+```{r cellprop}
+cellprop <- read.csv("../HVP_CD66CD45Subsets.csv", row.names = 1)
+```
+
+```{r demo}
+demo <- ctab %>% column_to_rownames(var="Sample_name") %>% dplyr::select(Responder_dose2, Age)
+demo$Responder_dose2 <- as.numeric(demo$Responder_dose2)
+```
+
+#### Within-subject correlation {#rhohat}
+
+```{r rhohat}
+cov_matrix <- PBtest::getSigma(t(dat.filt10.symbol), ctab$Responder_dose2, ctab$Subject_id)
+(rhohat <- cov_matrix[2])
+```
+
+```{r mod}
+set.seed(1234)
+mod <- FastMix(GeneExp=dat.filt10.symbol, CellProp=cellprop, Demo=demo,
+               independent=F, include.demo=FALSE, cov_matrix=cov_matrix)
+round(mod$fixed.results, 4)
+colSums(mod$re.ind.pvalue < 0.05)
+```
+
+
+<br>
+
+## Pathway analysis
+
+```{r pathway, message=FALSE}
+Ntop <- 100
+## map gene symbols to entrez ids
+library(org.Hs.eg.db)
+map2entrez <- mapIds(org.Hs.eg.db, rownames(dat.filt10.symbol), 'ENTREZID', 'SYMBOL')
+## pathway analysis for each random-effect/cell-type-specific DEG list
+covariates <- rownames(mod$fixed.results)
+lst.top.DEG <- lst.sig.path <- vector("list", length=length(covariates))
+names(lst.top.DEG) <- names(lst.sig.path) <- covariates
+for(term in covariates){
+  cat(term, "\n")
+  top.genes <- names(sort(mod$re.ind.pvalue[,term])[1:Ntop])
+  sig.path <- enrichPathway(gene=map2entrez[top.genes], pvalueCutoff=0.05, readable=T)
+  lst.sig.path[[term]] <- sig.path
+  lst.top.DEG[[term]] <- top.genes
+}
+
+## top DEGs
+tab.top.DEG <- do.call("cbind", lst.top.DEG)
+```
+
+Here, we perform pathway analysis for the top `r Ntop` DEGs from the above model.
+
+```{r topgenes}
+## top DEGs
+kable(tab.top.DEG) %>%
+  add_header_above(c("Main effect" = 3, 
+                     "Interaction effect with Responder_dose2" = 3, 
+                     "Interaction effect with Age" = 3)) %>%
+  kable_styling(bootstrap_options = c("hover")) %>%
+  scroll_box(width = "100%", height = "300px")
+```
+
+```{r sigpath}
+## significant pathways 
+lapply(lst.sig.path[4:6], function(z) z$Description)
+## unique genes in identified significant pathways
+lapply(lst.sig.path[4:6], function(z) sort(unique(unlist(strsplit(z$geneID, "/")))))
+```
