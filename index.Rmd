@@ -14,7 +14,7 @@ author:
 
 ## The Project
 
-[Text to be inserted.]
+Current licensed Hepatitis B vaccines require multiple doses to reach desirable efficacy. Immunity induced by HBV is complicated, which starts from innate immune responses, followed by adaptive responses. The response is a mixture of cell-mediated immunity and humoral immune responses, requiring different types of assays to elucidate. Multi-omics data analytics are esssential for undertanding the cellular mechanisum of the correlate of protection induced by the vaccination. Our objective is to integrate the publicly available studies on Hepatitis B vaccines (HBV) at the NIAID-funded ImmPort database (https://immport.org) and the Human Vaccines Project (HVP) for identification of predictors of HBV immunogenicity at cell population level. Specifically, this HVP innovation project aims to develop and apply innovative computational approaches to integrate and reanalyze multiple types of experiment data from the existing clinical studies on hepatitis B vaccine ENGERIX®-B for identifying cell type-specific immune signatures in response to the vaccination.
 
 
 ### Design of HVP01 study
