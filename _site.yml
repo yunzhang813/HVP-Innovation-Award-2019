@@ -11,6 +11,9 @@ navbar:
     href: bulk.html
   - text: "Deconvolution Analysis"
     href: deconv.html
+  right:
+  - text: "Go to GitHub Repo"
+    href: https://github.com/yunzhang813/HVP-Innovation-Award-2019
 output:
   html_document:
     theme: cosmo
