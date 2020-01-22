@@ -318,6 +318,7 @@ $(document).ready(function () {
 <li><a href="#csDEGs">Identification of cell type-specific markers</a>. Neutrophil markers are identified as the fixed effect inference from the deconvolutional model.</li>
 <li><a href="#scRNAseq">Validation with scRNA-seq markers</a>. The above neutrophil markers derived from the deconvolutional model are validated with the neutrophil markers derived from an independent single cell RNA-seq data analysis on the same subjects. A significant amount of commonly identified marker genes are reported.</li>
 <li><a href="#path">csDEGs and pathway analysis</a>. csDEGs are identified from the novel hypothesis test on the random effect predictions, and pathway enrichment analysis is performed on the top csDEGs to understand their biological functions using <a href="https://bioconductor.org/packages/devel/bioc/vignettes/ReactomePA/inst/doc/ReactomePA.html">ReactomePA</a>.</li>
+<li><a href="#discr">Discriminant score.</a> A discriminant score on cross-validation datasets shows that age is an impacting factor for vaccine response.</li>
 </ul></li>
 </ul>
 <p>Load useful packages.</p>
@@ -3523,6 +3524,15 @@ lapply(lst.sig.path[4:6], function(z) z$Description)</code></pre>
 ##  [9] &quot;Antimicrobial peptides&quot;                                                            
 ## [10] &quot;Cell-cell junction organization&quot;                                                   
 ## [11] &quot;Translocation of ZAP-70 to Immunological synapse&quot;</code></pre>
+</div>
+<div id="discr" class="section level3">
+<h3>Discriminant score</h3>
+<p>Lastly, we conducted a leave-two-out (one responder and one non-responder) cross-validation on the following two FastMix models: <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2 + age,}\]</span> <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2.}\]</span> The <a href="https://github.com/terrysun0302/FastMix">FastMix</a> package also nicely provide a function <code>score_func()</code> that produces discriminant scores for “new” (left-out) subjects based on the the fitted (training) model.</p>
+<p>In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups</p>
+<div class="figure">
+<img src="images/age-is-a-factor.png" style="width:90.0%" />
+
+</div>
 </div>
 </div>
 

@@ -24,6 +24,7 @@ This report is organized in the following sections.
     + [Identification of cell type-specific markers](#csDEGs). Neutrophil markers are identified as the fixed effect inference from the deconvolutional model.
     + [Validation with scRNA-seq markers](#scRNAseq). The above neutrophil markers derived from the deconvolutional model are validated with the neutrophil markers derived from an independent single cell RNA-seq data analysis on the same subjects. A significant amount of commonly identified marker genes are reported.
     + [csDEGs and pathway analysis](#path). csDEGs are identified from the novel hypothesis test on the random effect predictions, and pathway enrichment analysis is performed on the top csDEGs to understand their biological functions using [ReactomePA](https://bioconductor.org/packages/devel/bioc/vignettes/ReactomePA/inst/doc/ReactomePA.html).
+    + [Discriminant score.](#discr) A discriminant score on cross-validation datasets shows that age is an impacting factor for vaccine response.
 
 Load useful packages.
 ```{r package, message=FALSE, warning=FALSE, catch=FALSE}
@@ -163,11 +164,18 @@ Also we looked at the top `r Ntop` csDEGs for each interaction term. Based on th
 
 Below are significant pathways identified for the interaction term with the response covariate after dose 2. We see that the interferon immune signaling related pathways are frequently picked up.
 
-
-
 ```{r sigpath}
 ## significant pathways 
 lapply(lst.sig.path[4:6], function(z) z$Description)
 ```
 
+### Discriminant score {#discr}
 
+Lastly, we conducted a leave-two-out (one responder and one non-responder) cross-validation on the following two FastMix models:
+$$\mbox{gene expression ~ cell proportions + response after dose 2 + age,}$$
+$$\mbox{gene expression ~ cell proportions + response after dose 2.}$$
+The [FastMix](https://github.com/terrysun0302/FastMix) package also nicely provide a function `score_func()` that produces discriminant scores for "new" (left-out) subjects based on the the fitted (training) model.
+
+In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups
+
+![](images/age-is-a-factor.png){width=90%}
