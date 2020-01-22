@@ -9,8 +9,8 @@ navbar:
     href: data.html
   - text: "Bulk RNA-seq Analysis"
     href: bulk.html
-  - text: "Deconvolution Analysis by FastMix"
-    href: FastMix.html
+  - text: "Deconvolution Analysis"
+    href: deconv.html
 output:
   html_document:
     theme: cosmo

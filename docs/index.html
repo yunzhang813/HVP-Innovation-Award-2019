@@ -11,7 +11,7 @@
 
 
 
-<meta name="date" content="2020-01-06" />
+<meta name="date" content="2020-01-21" />
 
 <title>HVP Innovation Award 2019</title>
 
@@ -282,7 +282,7 @@ $(document).ready(function () {
   <a href="bulk.html">Bulk RNA-seq Analysis</a>
 </li>
 <li>
-  <a href="FastMix.html">Deconvolution Analysis by FastMix</a>
+  <a href="deconv.html">Deconvolution Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -303,10 +303,10 @@ $(document).ready(function () {
 <h4 class="author">Aishwarya Mandava</h4>
 <a class="author_email" href="mailto:#"><a href="mailto:amandava@jcvi.org">amandava@jcvi.org</a></a>
 </address>
-<h4 class="author">Yu (Max) Qian</h4>
+<h4 class="author">Yu (Max) Qian* (*corresponding)</h4>
 <a class="author_email" href="mailto:#"><a href="mailto:mqian@jcvi.org">mqian@jcvi.org</a></a>
 </address>
-<h4 class="date">January 06, 2020</h4>
+<h4 class="date">January 21, 2020</h4>
 
 </div>
 
@@ -314,13 +314,58 @@ $(document).ready(function () {
 <p><br></p>
 <div id="the-project" class="section level2">
 <h2>The Project</h2>
+<p>[Text to be inserted.]</p>
+<div id="design-of-hvp01-study" class="section level3">
+<h3>Design of HVP01 study</h3>
+<p>This is a brief summary of the HVP01 study. [Text to be inserted.] For more details, please see its <a href="https://clinicaltrials.gov/ct2/show/study/NCT03083158">clinical trial page</a>.</p>
+</div>
+<div id="data-availability" class="section level3">
+<h3>Data availability</h3>
+<p>In this project, we are going to use data from the following.</p>
+<ul>
+<li>Transcriptome profiling data
+<ul>
+<li>RNA sequencing of whole blood (bulk RNA-seq)</li>
+<li>RNA sequencing of single immune cells (scRNA-seq)</li>
+</ul></li>
+<li>Flow cytometry data</li>
+<li>Hepatitis B surface antibody (anti-HBs) titer value</li>
+<li>Clinical metadata</li>
+</ul>
+<p>For data sharing, please contact [which team?]</p>
 <p><br></p>
+</div>
+</div>
+<div id="the-report" class="section level2">
+<h2>The Report</h2>
+<p>This report only serves the purpose of depositing code and script for the above project. For all other purposes, please contact us directly.</p>
+<div id="table-of-contents" class="section level3">
+<h3>Table of contents</h3>
+<ul>
+<li>
+<a href='data.html'>Data Prep</a><br/><code>data.Rmd</code>
+</li>
+<li>
+<a href='bulk.html'>Bulk RNA-seq Analysis</a><br/><code>bulk.Rmd</code>
+</li>
+<li>
+<a href='deconv.html'>Deconvolution Anlaysis</a><br/><code>deconv.Rmd</code>
+</li>
+</ul>
 <p>We will be using the following auxiliary packages to generate this set of reports.</p>
 <pre class="r"><code>library(dplyr)
 library(kableExtra)
 library(ggplot2)
 library(gridExtra)
 library(grid)</code></pre>
+<p><br></p>
+</div>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2>Acknowledgements</h2>
+<p>This work is funded by [Text to be inserted.] Richard Scheuermann, Brian Aevermann, UBC, …</p>
+<p><br></p>
+<p>See our other works at <a href="https://www.jcvi.org/">JCVI</a>.</p>
 </div>
 
 

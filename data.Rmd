@@ -10,12 +10,12 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 
 ## Overview
 
-The __goal__ of this data preprocessing procedure is to _filter and transform_ the RNA-seq count data of the HVP01 Immunity to Hepatitis B Vaccine study, so that the filtered and transformed data follows approaximately a constinuous normal distribution, which can then be fitted by advanced statistical models, such as the linear mixed-effect regression model, for differential analysis and deconvolution analysis.
+The __goal__ of this data preprocessing procedure is to filter and transform the RNA-seq count data of the HVP01 Immunity to Hepatitis B Vaccine study, so that the filtered and transformed data follows approaximately a constinuous normal distribution, which can then be fitted by advanced statistical models, such as the linear mixed-effect regression model, for differential analysis and deconvolution analysis.
 
-Our general __strategy__ of preprocessing RNA-seq count data follows three steps:
+Our general strategy of preprocessing RNA-seq count data follows three steps:
 
 1. Filter low count and low variance genes.
-2. Choose a data transformation that transforms the count data to some _normally_ distributed data. For RNA-seq, it specifically means to
+2. Choose a data transformation that transforms the count data to some normally distributed data. For RNA-seq, it specifically means to
     + transform discrete data to continuous data, and
     + stabilize the mean-variance relationship, i.e. mitigate overdispersion.
 3. Plot the filtered and transformed data distribution, and adjust the choices from previous two steps if needed.
@@ -40,7 +40,7 @@ library(vsn) #for menaSdPlot
 
 ## A brief recap of DESeq2 data transformations {#DESeq2}
 
-Briefly, the `DESeq2` R package provides two alternative approaches that offer more theoretical justification than the naive log2-transformation on RNA-seq count data. One makes use of the concept of variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010), and the other is the regularized logarithm (rlog), which incorporates a prior on the sample differences (Love, Huber, and Anders 2014). Both transformations produce transformed data on the log2 scale which has been normalized with respect to library size or other normalization factors.
+Briefly, the DESeq2 R package provides two alternative approaches that offer more theoretical justification than the naive log2-transformation on RNA-seq count data. One makes use of the concept of variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010), and the other is the regularized logarithm (rlog), which incorporates a prior on the sample differences (Love, Huber, and Anders 2014). Both transformations produce transformed data on the log2 scale which has been normalized with respect to library size or other normalization factors.
 
 For more information, please see [DESeq2 Bioconductor page](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#count-data-transformations).
 
@@ -154,7 +154,7 @@ hist(rowMeans(mat1.filt), breaks=50)
 meanSdPlot(mat1.filt)
 ```
 
-### rlog-transformation on filtered data
+#### rlog-transformation on filtered data
 
 ```{r mycount-filt-rlog, fig.show='hold', out.width=c('50%', '50%')}
 ## rlog
