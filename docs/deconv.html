@@ -12,7 +12,7 @@
 
 
 
-<title>Deconvolution Anlaysis by FastMix</title>
+<title>Deconvolution Anlaysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -282,7 +282,7 @@ $(document).ready(function () {
   <a href="bulk.html">Bulk RNA-seq Analysis</a>
 </li>
 <li>
-  <a href="FastMix.html">Deconvolution Analysis by FastMix</a>
+  <a href="deconv.html">Deconvolution Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -296,7 +296,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Deconvolution Anlaysis by <code>FastMix</code></h1>
+<h1 class="title toc-ignore">Deconvolution Anlaysis</h1>
 
 </div>
 
@@ -304,22 +304,63 @@ $(document).ready(function () {
 <p><br></p>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>The <strong>goal</strong> of this analysis</p>
+<p>The <strong>goal</strong> of this analysis is to apply deconvolutional model to identify <em>cell type-specific</em> differentially expressed genes (csDEGs). In this project, we have both flow cytometry and gene expression data on the same samples. The deconvolutional model will be built on the bulk RNA-seq data with known cell proportions estimated from the flow cytometry data.</p>
+<p>With flow cytometry data, we can identify proportions of different cell populations from the whole blood samples. Identification of cell populations and estimation of corresponding cell proportions are done using the <a href="https://www.ncbi.nlm.nih.gov/pubmed/29665244">DAFi</a> approach we recently developed. DAFi is an automated gating strategy that can effectively reduce human bias in the subjective manual gating analysis.</p>
+<p>The deconvolutional model, dubbed as “FastMix”, is a new analytic pipeline co-developed by our team, that combines the deconvolution step with downstream analysis based on linear mixed-effects regression model. It takes gene expression data, cell proportions, and demographic covariates as input, and fits a linear mixed-effects model using a novel computationally-efficient moment-based covariance estimator, which is robust and can achieve comparable accuracy with the traditional EM-based mixed-effects model fitting algorithm. Based on the deconvolutional model, the analytical pipeline also provides a novel comptetitive hypothesis test to identify genes that have significantly larger or smaller predicted random effect (cell type-specific expression) with a given covariate, a.k.a. csDEGs. To learn more about <code>FastMix</code>, please read <a href="https://github.com/terrysun0302/FastMix">here</a>.</p>
+<p>This report is organized in the following sections.</p>
+<ul>
+<li><a href="#data">Cell proprotions and demographic covariates</a>. Detailed view of the data to be used in the model. Note that the within-subject <a href="#rhohat">correlation</a> is <em>not</em> negligble.</li>
+<li><a href="#WModel4">Model fitting</a>. Fit the FastMix model: <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2 + age}.\]</span></li>
+<li><a href="#downstream">Downstream analyses</a>:
+<ul>
+<li><a href="#csDEGs">Identification of cell type-specific markers</a>. Neutrophil markers are identified as the fixed effect inference from the deconvolutional model.</li>
+<li><a href="#scRNAseq">Validation with scRNA-seq markers</a>. The above neutrophil markers derived from the deconvolutional model are validated with the neutrophil markers derived from an independent single cell RNA-seq data analysis on the same subjects. A significant amount of commonly identified marker genes are reported.</li>
+<li><a href="#path">csDEGs and pathway analysis</a>. csDEGs are identified from the novel hypothesis test on the random effect predictions, and pathway enrichment analysis is performed on the top csDEGs to understand their biological functions using <a href="https://bioconductor.org/packages/devel/bioc/vignettes/ReactomePA/inst/doc/ReactomePA.html">ReactomePA</a>.</li>
+</ul></li>
+</ul>
 <p>Load useful packages.</p>
 <pre class="r"><code>library(FastMix)
 library(ReactomePA)</code></pre>
 <p><br></p>
 </div>
-<div id="WModel4" class="section level2">
-<h2>Model fitting: Responder_dose2, Age</h2>
+<div id="data" class="section level2">
+<h2>Cell proportions and demographic covariates</h2>
+<div id="cell-proportions" class="section level3">
+<h3>Cell proportions</h3>
+<p>We load cell proportions from the file “HVP_CD66CD45Subsets.csv” to <code>cellprop</code>.</p>
 <pre class="r"><code>cellprop &lt;- read.csv(&quot;../HVP_CD66CD45Subsets.csv&quot;, row.names = 1)</code></pre>
+<p>For this deconvolution analysis, we work with three abundant cell populations:</p>
+<ul>
+<li>the CD66 positive and CD45 positive (CD66pCD45p) population - this is the neutrophil cell type,</li>
+<li>the CD66 negative and CD45 positive (CD66nCD45p) population, and</li>
+<li>the rest population - for all other cells.</li>
+</ul>
+<p>The average proportions for the above cell populations are 0.219, 0.136, 0.645, respectively. Cell proportions sum up to 1.</p>
+</div>
+<div id="demographic-covariates" class="section level3">
+<h3>Demographic covariates</h3>
+<p>We consider two demographic covariates: response after dose 2 and age. From the <a href='bulk.html#ctab'>sample table</a> , we curate and store those covariates in <code>demo</code>.</p>
 <pre class="r"><code>demo &lt;- ctab %&gt;% column_to_rownames(var=&quot;Sample_name&quot;) %&gt;% dplyr::select(Responder_dose2, Age)
 demo$Responder_dose2 &lt;- as.numeric(demo$Responder_dose2)</code></pre>
-<div id="rhohat" class="section level4">
-<h4>Within-subject correlation</h4>
+</div>
+<div id="all-covariates" class="section level3">
+<h3>All covariates</h3>
+<p>The following figures show detailed overview of cell proportions and demographic covariates. <img src="images/cellprop-demo.png" style="width:90.0%" /></p>
+</div>
+<div id="rhohat" class="section level3">
+<h3>Within-subject correlation</h3>
+<p>To make the best use of the multiple time points data, we use PBtest again to estimate the within-subject correlation, which will be provided to the weighted FastMix model for handling repeated measurements.</p>
 <pre class="r"><code>cov_matrix &lt;- PBtest::getSigma(t(dat.filt10.symbol), ctab$Responder_dose2, ctab$Subject_id)
 (rhohat &lt;- cov_matrix[2])</code></pre>
 <pre><code>## [1] 0.3789871</code></pre>
+<p><em>Note that there is quite strong correlation (= 0.379) within-subject, ignoring which is not recommended.</em></p>
+<p><br></p>
+</div>
+</div>
+<div id="WModel4" class="section level2">
+<h2>Model fitting</h2>
+<p>Recall that our deconvolutional model is a regression-like model associating the bulk gene expression level with the covariates. <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2 + age}\]</span></p>
+<p>Using <code>cellprop</code>, <code>demo</code>, and <code>cov_matrix</code> obtained above, we fit the deconvolution model for the bulk RNA-seq data <code>dat.filt10.symbol</code> as follows.</p>
 <pre class="r"><code>set.seed(1234)
 mod &lt;- FastMix(GeneExp=dat.filt10.symbol, CellProp=cellprop, Demo=demo,
                independent=F, include.demo=FALSE, cov_matrix=cov_matrix)
@@ -345,11 +386,12 @@ round(mod$fixed.results, 4)</code></pre>
 ##                        261                        274 
 ##                   rest.Age 
 ##                        890</code></pre>
+<p>The above are number of cell type-specific markers (CD66pCD45p, CD66nCD45p, rest) and csDEGs for each interaction terms (CD66pCD45p.Responder_dose2, CD66nCD45p.Responder_dose2, rest.Responder_dose2, CD66pCD45p.Age, CD66nCD45p.Age, rest.Age).</p>
 <p><br></p>
 </div>
-</div>
-<div id="pathway-analysis" class="section level2">
-<h2>Pathway analysis</h2>
+<div id="downstream" class="section level2">
+<h2>Downstream analyses</h2>
+<p>We use the following chunk to perform downstream analyses all at one pass.</p>
 <pre class="r"><code>Ntop &lt;- 100
 ## map gene symbols to entrez ids
 library(org.Hs.eg.db)
@@ -359,48 +401,34 @@ covariates &lt;- rownames(mod$fixed.results)
 lst.top.DEG &lt;- lst.sig.path &lt;- vector(&quot;list&quot;, length=length(covariates))
 names(lst.top.DEG) &lt;- names(lst.sig.path) &lt;- covariates
 for(term in covariates){
-  cat(term, &quot;\n&quot;)
+  # cat(term, &quot;\n&quot;)
   top.genes &lt;- names(sort(mod$re.ind.pvalue[,term])[1:Ntop])
   sig.path &lt;- enrichPathway(gene=map2entrez[top.genes], pvalueCutoff=0.05, readable=T)
   lst.sig.path[[term]] &lt;- sig.path
   lst.top.DEG[[term]] &lt;- top.genes
-}</code></pre>
-<pre><code>## CD66pCD45p 
-## CD66nCD45p 
-## rest 
-## CD66pCD45p.Responder_dose2 
-## CD66nCD45p.Responder_dose2 
-## rest.Responder_dose2 
-## CD66pCD45p.Age 
-## CD66nCD45p.Age 
-## rest.Age</code></pre>
-<pre class="r"><code>## top DEGs
+}
+## top DEGs
 tab.top.DEG &lt;- do.call(&quot;cbind&quot;, lst.top.DEG)</code></pre>
-<p>Here, we perform pathway analysis for the top 100 DEGs from the above model.</p>
+<div id="csDEGs" class="section level3">
+<h3>Identification of cell type-specific markers</h3>
+<p>For now, let’s focus on the top 100 markers or csDEGs from the deconvolutional model. Table below is ordered in increasing p-values (most siginificant to least significant) column-wise.</p>
 <pre class="r"><code>## top DEGs
 kable(tab.top.DEG) %&gt;%
-  add_header_above(c(&quot;Main effect&quot; = 3, 
-                     &quot;Interaction effect with Responder_dose2&quot; = 3, 
-                     &quot;Interaction effect with Age&quot; = 3)) %&gt;%
-  kable_styling(bootstrap_options = c(&quot;hover&quot;)) %&gt;%
-  scroll_box(width = &quot;100%&quot;, height = &quot;300px&quot;)</code></pre>
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; overflow-x: scroll; width:100%; ">
-<table class="table table-hover" style="margin-left: auto; margin-right: auto;">
+  add_header_above(c(&quot;Cell type-specific markers&quot; = 3, &quot;csDEGs&quot; = 6)) %&gt;%
+  kable_styling() %&gt;%
+  scroll_box(width = &quot;100%&quot;, height = &quot;500px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
+<table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; position: sticky; top:0; background-color: #FFFFFF;" colspan="3">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Main effect
+Cell type-specific markers
 </div>
 </th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; position: sticky; top:0; background-color: #FFFFFF;" colspan="3">
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; position: sticky; top:0; background-color: #FFFFFF;" colspan="6">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Interaction effect with Responder_dose2
-</div>
-</th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; position: sticky; top:0; background-color: #FFFFFF;" colspan="3">
-<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Interaction effect with Age
+csDEGs
 </div>
 </th>
 </tr>
@@ -3338,6 +3366,67 @@ SCART1
 </tbody>
 </table>
 </div>
+<p>The first column is the neutrophil markers derived from the deconvolutional model. The top neutrophil markers are RSAD2, IFITM3, FCGR3B, ACSL1, IFIT1, IFIT2.</p>
+</div>
+<div id="scRNAseq" class="section level3">
+<h3>Validation with scRNA-seq markers</h3>
+<p>Independently, single immune cell RNA-seq data are analyzed by Brian Aevermann, following the <a href="https://arxiv.org/abs/0803.0476">Louvain clustering</a> for cell populations identification and <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0844-5">MAST</a> generalized linear model for marker gene identification of the identified cell population clusters. Neutrophils are one of the major cell population clusters identified in the single cell analysis. The single cell analysis identified 365 markers for the neutrophils, which is available upon request.</p>
+<p>We overlay the two marker genes list in the following venn diagram. A hypergeometric test shows the overlapping of the venn diagram is highly significant.</p>
+<div class="figure">
+<img src="images/venn_CD66pCD45p_neut_sc_new_FC_top100.png" style="width:30.0%" />
+
+</div>
+<pre class="r"><code>## hypergeometric test
+phyper(38,365,13157-365,100, lower.tail=FALSE)</code></pre>
+<pre><code>## [1] 4.969543e-35</code></pre>
+<p>The common marker genes are</p>
+<pre class="r"><code>## read in the common marker genes from a pre-saved file
+commongenes &lt;- read.csv(&quot;../tab_commongenes_singlecell_comparison_top100.csv&quot;, col.names = &quot;Marker gene&quot;)
+commongenes</code></pre>
+<pre><code>##    Marker.gene
+## 1       IFITM3
+## 2       FCGR3B
+## 3        ACSL1
+## 4        IFIT2
+## 5         AQP9
+## 6        BASP1
+## 7        CXCR2
+## 8       IFITM2
+## 9        CXCR1
+## 10       PROK2
+## 11       NAMPT
+## 12       CSF3R
+## 13        MNDA
+## 14   TNFRSF10C
+## 15        FPR1
+## 16       FFAR2
+## 17        SOD2
+## 18      FCGR2A
+## 19       LITAF
+## 20        MXD1
+## 21        VNN2
+## 22    APOBEC3A
+## 23       ITM2B
+## 24       HLA-C
+## 25         LYN
+## 26      S100A9
+## 27       C5AR1
+## 28        NCF1
+## 29         GCA
+## 30       MSRB1
+## 31       NCF1C
+## 32     S100A11
+## 33      RNF149
+## 34       FRAT2
+## 35        TLR1
+## 36      MBOAT7
+## 37       SORL1
+## 38        NCF2</code></pre>
+</div>
+<div id="path" class="section level3">
+<h3>csDEGs and pathway analysis</h3>
+<p>Also we looked at the top 100 csDEGs for each interaction term. Based on these csDEGs, we performed pathway analysis using the <a href="https://reactome.org/">Reactome pathways</a> and <a href="https://bioconductor.org/packages/devel/bioc/vignettes/ReactomePA/inst/doc/ReactomePA.html">ReactomePA Bioconductor package</a>.</p>
+<p>Below are significant pathways identified for the interaction term with the response covariate after dose 2. We see that the interferon immune signaling related pathways are frequently picked up.</p>
 <pre class="r"><code>## significant pathways 
 lapply(lst.sig.path[4:6], function(z) z$Description)</code></pre>
 <pre><code>## $CD66pCD45p.Responder_dose2
@@ -3432,29 +3521,7 @@ lapply(lst.sig.path[4:6], function(z) z$Description)</code></pre>
 ##  [9] &quot;Antimicrobial peptides&quot;                                                            
 ## [10] &quot;Cell-cell junction organization&quot;                                                   
 ## [11] &quot;Translocation of ZAP-70 to Immunological synapse&quot;</code></pre>
-<pre class="r"><code>## unique genes in identified significant pathways
-lapply(lst.sig.path[4:6], function(z) sort(unique(unlist(strsplit(z$geneID, &quot;/&quot;)))))</code></pre>
-<pre><code>## $CD66pCD45p.Responder_dose2
-##  [1] &quot;CD274&quot;    &quot;DDX58&quot;    &quot;EIF2AK2&quot;  &quot;GBP1&quot;     &quot;HERC5&quot;    &quot;HLA-DRB5&quot;
-##  [7] &quot;IFI6&quot;     &quot;IFIH1&quot;    &quot;IFIT1&quot;    &quot;IFIT2&quot;    &quot;IFIT3&quot;    &quot;ISG15&quot;   
-## [13] &quot;MX1&quot;      &quot;MX2&quot;      &quot;OAS2&quot;     &quot;OAS3&quot;     &quot;OASL&quot;     &quot;RPL11&quot;   
-## [19] &quot;RPL21&quot;    &quot;RPL23&quot;    &quot;RPL31&quot;    &quot;RPL34&quot;    &quot;RPL41&quot;    &quot;RPS27&quot;   
-## [25] &quot;RPS4Y1&quot;   &quot;RSAD2&quot;    &quot;USP18&quot;   
-## 
-## $CD66nCD45p.Responder_dose2
-##  [1] &quot;CD177&quot;    &quot;CD8A&quot;     &quot;CD8B&quot;     &quot;FCGR1A&quot;   &quot;FCGR1B&quot;   &quot;GP9&quot;     
-##  [7] &quot;HDC&quot;      &quot;HERC5&quot;    &quot;HLA-G&quot;    &quot;IFI6&quot;     &quot;IFIT1&quot;    &quot;IFIT2&quot;   
-## [13] &quot;IFIT3&quot;    &quot;IFITM3&quot;   &quot;ISG15&quot;    &quot;MT2A&quot;     &quot;RPL23&quot;    &quot;RPL26&quot;   
-## [19] &quot;RPL31&quot;    &quot;RPL34&quot;    &quot;RPL9&quot;     &quot;RPS17&quot;    &quot;RPS24&quot;    &quot;RPS27&quot;   
-## [25] &quot;RPS3A&quot;    &quot;RPS7&quot;     &quot;RSAD2&quot;    &quot;SERPING1&quot; &quot;SLC6A8&quot;   &quot;SOCS3&quot;   
-## [31] &quot;USP18&quot;   
-## 
-## $rest.Responder_dose2
-##  [1] &quot;AFDN&quot;     &quot;CAMP&quot;     &quot;CD22&quot;     &quot;CD79A&quot;    &quot;CD79B&quot;    &quot;CD8A&quot;    
-##  [7] &quot;CD8B&quot;     &quot;DEFA3&quot;    &quot;EIF2AK2&quot;  &quot;HERC5&quot;    &quot;HLA-DQA2&quot; &quot;HLA-DRB5&quot;
-## [13] &quot;IFI6&quot;     &quot;IFIT1&quot;    &quot;IFIT2&quot;    &quot;ISG15&quot;    &quot;JUP&quot;      &quot;LCN2&quot;    
-## [19] &quot;LTF&quot;      &quot;MX1&quot;      &quot;NECTIN2&quot;  &quot;OAS2&quot;     &quot;OAS3&quot;     &quot;OASL&quot;    
-## [25] &quot;RSAD2&quot;    &quot;SIGLEC1&quot;  &quot;USP18&quot;</code></pre>
+</div>
 </div>
 
 

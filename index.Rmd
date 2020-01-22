@@ -6,7 +6,7 @@ author:
     email: zhangy@jcvi.org
   - name: Aishwarya Mandava
     email: amandava@jcvi.org
-  - name: Yu (Max) Qian
+  - name: Yu (Max) Qian* (*corresponding)
     email: mqian@jcvi.org
 ---
 
@@ -14,7 +14,49 @@ author:
 
 ## The Project
 
+[Text to be inserted.]
+
+
+### Design of HVP01 study
+
+This is a brief summary of the HVP01 study. [Text to be inserted.] For more details, please see its [clinical trial page](https://clinicaltrials.gov/ct2/show/study/NCT03083158).
+
+
+### Data availability
+
+In this project, we are going to use data from the following.
+
+- Transcriptome profiling data
+    + RNA sequencing of whole blood (bulk RNA-seq)
+    + RNA sequencing of single immune cells (scRNA-seq)
+- Flow cytometry data
+- Hepatitis B surface antibody (anti-HBs) titer value
+- Clinical metadata
+
+For data sharing, please contact [which team?]
+
 <br>
+
+## The Report
+
+This report only serves the purpose of depositing code and script for the above project. For all other purposes, please contact us directly.
+
+### Table of contents
+
+```{r echo=FALSE, results='asis'}
+# rmd <- Sys.glob("*.Rmd")
+# rmd <- rmd[rmd != "index.Rmd"]
+rmd <- c("data.Rmd", "bulk.Rmd", "deconv.Rmd")
+html <- sub(".Rmd", ".html", rmd)
+lines <- lapply(rmd, readLines)
+yaml <- lapply(lines, rmarkdown:::parse_yaml_front_matter)
+cat("<ul>")
+for (i in seq_along(rmd)) {
+  cat(paste0("<li><a href='", html[i], "'>", yaml[[i]]$title, "</a><br/>",
+             "<code>", rmd[i], "</code>", "</li>"))
+}
+cat("</ul>")
+```
 
 We will be using the following auxiliary packages to generate this set of reports.
 ```{r package, message=FALSE, warning=FALSE, catch=FALSE}
@@ -24,3 +66,14 @@ library(ggplot2)
 library(gridExtra)
 library(grid)
 ```
+
+<br>
+
+## Acknowledgements
+
+This work is funded by [Text to be inserted.] Richard Scheuermann, Brian Aevermann, UBC, ...
+
+
+<br>
+
+See our other works at [JCVI](https://www.jcvi.org/).

@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 
 ## Overview
 
-The __goal__ of this analysis is to identify differentially expressed genes (DEG) between responders and non-responders in the HVP01 study using the _bulk_ RNA-seq data. 
+The __goal__ of this analysis is to identify differentially expressed genes (DEG) between responders and non-responders in the HVP01 study using the bulk RNA-seq data. 
 
 From whole blood transcriptome profiling, we have bulk RNA-seq data for 15 subjects over 5 time points (visit day 0,1,3,7,14). The studied Hepatitis B Vaccine (drug: ENGERIX®-B) consists of three doses. After each dose, response to the vaccination is determined by the anti-HBs antibody level above 10 mIU/mL.
 
-In this report, we __focus__ on the _response after dose 2_ (with 13 responders and two non-responders). At a single time point, we perform a naive t-test. To include multiple time points, we also perform the parametric "PBtest", which takes into account the repeated measurement data structure. For more about the `PBtest`, please read [here](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2783-8).
+In this report, we focus on the __response after dose 2__ (with 13 responders and two non-responders). At a single time point, we perform a naive t-test. To include multiple time points, we also perform the parametric [PBtest](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2783-8), which takes into account the repeated measurement data structure.
 
 This report is organized in the following sections.
 
@@ -38,7 +38,7 @@ alpha <- 0.05
 
 ## Sample table {#ctab}
 
-Earlier, we read in "HVP_sampleTable_response_May18.csv", which contains the dose response and other clinical information for each sample in the expression matrix.
+Earlier, we read in "HVP_sampleTable_response_May18.csv" to `ctab`, which contains the dose response and other clinical information for each sample in the expression matrix.
 
 ```{r ctab}
 kable(ctab) %>%
@@ -68,13 +68,13 @@ head(sort(padj.t.D7)) #top genes
 
 There is only `r length(sig.gene.D7)` DEG identified using sinlge time point at Day 7. The following plot shows that this gene is under-regulated in the responders.
 
-```{r ttest-plot}
+```{r ttest-plot, out.width=c('50%', '50%')}
 ## plot
 plot(dat.filt10.symbol[sig.gene.D7,ctab.D7$Sample_name], 
      col=as.factor(ctab.D7$Responder_dose2), pch=19,
      xlab="Subject", ylab="Day 7 expression level", 
      main=paste0(sig.gene.D7, ", p-value = ", round(padj.t.D7[sig.gene.D7],3)))
-legend("topleft", c("non-responder","responder"), col=1:2, pch=19)
+legend("topleft", c("Non-responder","Responder"), col=1:2, pch=19)
 ```
 
 <br>

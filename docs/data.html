@@ -281,7 +281,7 @@ $(document).ready(function () {
   <a href="bulk.html">Bulk RNA-seq Analysis</a>
 </li>
 <li>
-  <a href="FastMix.html">Deconvolution Analysis by FastMix</a>
+  <a href="deconv.html">Deconvolution Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -303,11 +303,11 @@ $(document).ready(function () {
 <p><br></p>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
-<p>The <strong>goal</strong> of this data preprocessing procedure is to <em>filter and transform</em> the RNA-seq count data of the HVP01 Immunity to Hepatitis B Vaccine study, so that the filtered and transformed data follows approaximately a constinuous normal distribution, which can then be fitted by advanced statistical models, such as the linear mixed-effect regression model, for differential analysis and deconvolution analysis.</p>
-<p>Our general <strong>strategy</strong> of preprocessing RNA-seq count data follows three steps:</p>
+<p>The <strong>goal</strong> of this data preprocessing procedure is to filter and transform the RNA-seq count data of the HVP01 Immunity to Hepatitis B Vaccine study, so that the filtered and transformed data follows approaximately a constinuous normal distribution, which can then be fitted by advanced statistical models, such as the linear mixed-effect regression model, for differential analysis and deconvolution analysis.</p>
+<p>Our general strategy of preprocessing RNA-seq count data follows three steps:</p>
 <ol style="list-style-type: decimal">
 <li>Filter low count and low variance genes.</li>
-<li>Choose a data transformation that transforms the count data to some <em>normally</em> distributed data. For RNA-seq, it specifically means to
+<li>Choose a data transformation that transforms the count data to some normally distributed data. For RNA-seq, it specifically means to
 <ul>
 <li>transform discrete data to continuous data, and</li>
 <li>stabilize the mean-variance relationship, i.e. mitigate overdispersion.</li>
@@ -333,7 +333,7 @@ library(vsn) #for menaSdPlot</code></pre>
 </div>
 <div id="DESeq2" class="section level2">
 <h2>A brief recap of DESeq2 data transformations</h2>
-<p>Briefly, the <code>DESeq2</code> R package provides two alternative approaches that offer more theoretical justification than the naive log2-transformation on RNA-seq count data. One makes use of the concept of variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010), and the other is the regularized logarithm (rlog), which incorporates a prior on the sample differences (Love, Huber, and Anders 2014). Both transformations produce transformed data on the log2 scale which has been normalized with respect to library size or other normalization factors.</p>
+<p>Briefly, the DESeq2 R package provides two alternative approaches that offer more theoretical justification than the naive log2-transformation on RNA-seq count data. One makes use of the concept of variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010), and the other is the regularized logarithm (rlog), which incorporates a prior on the sample differences (Love, Huber, and Anders 2014). Both transformations produce transformed data on the log2 scale which has been normalized with respect to library size or other normalization factors.</p>
 <p>For more information, please see <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#count-data-transformations">DESeq2 Bioconductor page</a>.</p>
 <p><br></p>
 </div>
@@ -428,8 +428,8 @@ hist(rowMeans(mat1.filt), breaks=50)
 meanSdPlot(mat1.filt)</code></pre>
 <p><img src="data_files/figure-html/mycount-filt-vsd-1.png" width="50%" /><img src="data_files/figure-html/mycount-filt-vsd-2.png" width="50%" /></p>
 </div>
-<div id="rlog-transformation-on-filtered-data" class="section level3">
-<h3>rlog-transformation on filtered data</h3>
+<div id="rlog-transformation-on-filtered-data" class="section level4">
+<h4>rlog-transformation on filtered data</h4>
 <pre class="r"><code>## rlog
 rld.filt &lt;- rlog(dds.filt)</code></pre>
 <pre><code>## rlog() may take a long time with 50 or more samples,
