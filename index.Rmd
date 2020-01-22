@@ -14,15 +14,20 @@ author:
 
 ## The Project
 
-Current licensed Hepatitis B vaccines require multiple doses to reach desirable efficacy. Immunity induced by HBV is complicated, which starts from innate immune responses, followed by adaptive responses. The response is a mixture of cell-mediated immunity and humoral immune responses, requiring different types of assays to elucidate. Multi-omics data analytics are esssential for undertanding the cellular mechanisum of the correlate of protection induced by the vaccination. Our objective is to integrate the publicly available studies on Hepatitis B vaccines (HBV) at the NIAID-funded ImmPort database (https://immport.org) and the Human Vaccines Project (HVP) for identification of predictors of HBV immunogenicity at cell population level. Specifically, this HVP innovation project aims to develop and apply innovative computational approaches to integrate and reanalyze multiple types of experiment data from the existing clinical studies on hepatitis B vaccine ENGERIX®-B for identifying cell type-specific immune signatures in response to the vaccination.
+Current licensed Hepatitis B vaccines require multiple doses to reach desirable efficacy. Immunity induced by HBV is complicated, which starts from innate immune responses, followed by adaptive responses. The response is a mixture of cell-mediated immunity and humoral immune responses, requiring different types of assays to elucidate. Multi-omics data analytics are esssential for undertanding the cellular mechanisum of the correlate of protection induced by the vaccination. Our objective is to integrate the publicly available studies on Hepatitis B vaccines (HBV) at the NIAID-funded [ImmPort database](https://immport.org) and the Human Vaccines Project (HVP) for identification of predictors of HBV immunogenicity at cell population level. Specifically, this HVP innovation project aims to develop and apply innovative computational approaches to integrate and reanalyze multiple types of experiment data from the existing clinical studies on hepatitis B vaccine ENGERIX-B for identifying cell type-specific immune signatures in response to the vaccination.
 
+### Materials and Data
+
+Datasets used in this project are from two ENGERIX-B vaccine studies. One is publicly available at the NIAID Immunology Database and Analysis Portal: [SDY89](https://www.immport.org). The other is the study [HVP01](https://clinicaltrials.gov/ct2/show/NCT03083158). Both studies have assays on whole blood or peripheral blood mononuclear cell (PBMC) samples from adults (young and old), including flow cytometry for immunophenotyping, microarray or RNA-seq for bulk transcriptomics, and virus neutralization assay for serum antibody titers (anti-HBs). Correlates of protection (anti-HBs) are available in both studies for defining cohorts of responders (according to [Wooden 2018](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6183335), correlate for Engerix-B efficacy is titer >10 mIU/ml). Study HVP01 also has RNA-seq data of single immune cells (scRNA-seq). Both studies have planned 11 visits, to collect different types of assay data before and after three doses of the vaccination. Study HVP01 has both flow cytometry and RNA-seq data for all 15 subjects (N=15) for the first 5 of the 11 visits, before and after the 1st dose of the vaccination. For SDY89, we have both flow cytometry and microarray data for 12 of total 50 subjects (N=12) across 8 of the 11 visits, before and after the first two doses of the vaccination.
+
+This page is for summary of the HVP innovation project, so we focus on the analysis of HVP01 study to demonstrate the analysis procedure and results. Feel free to contact us for the analysis results of data from ImmPort SDY89.
 
 ### Design of HVP01 study
 
-This is a brief summary of the HVP01 study. [Text to be inserted.] For more details, please see its [clinical trial page](https://clinicaltrials.gov/ct2/show/study/NCT03083158).
+Design of the HVP01 study can be found at [clinical trial page](https://clinicaltrials.gov/ct2/show/study/NCT03083158).
 
 
-### Data availability
+### Data availability of HVP01 sudy
 
 In this project, we are going to use data from the following.
 
@@ -33,7 +38,6 @@ In this project, we are going to use data from the following.
 - Hepatitis B surface antibody (anti-HBs) titer value
 - Clinical metadata
 
-For data sharing, please contact [which team?]
 
 <br>
 
@@ -71,7 +75,7 @@ library(grid)
 
 ## Acknowledgements
 
-This work is funded by [Text to be inserted.] Richard Scheuermann, Brian Aevermann, UBC, ...
+The work is funded by the Human Vaccines Project (HVP). Reanalysis of data from ImmPort studies is partially supported by NIAID UH2AI132342. Data and metadata of the HVP01 vaccination study used in the analytics were provided by HVP and Kollmann group of University of British Columbia. Brian Aevermann of Scheuermann group at JCVI provided the single cell RNA-seq data analysis results from the HVP01 study for validating the cell type specific marker genes identified in our data analysis.
 
 
 <br>
