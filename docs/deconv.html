@@ -3528,7 +3528,7 @@ lapply(lst.sig.path[4:6], function(z) z$Description)</code></pre>
 <div id="discr" class="section level3">
 <h3>Discriminant score</h3>
 <p>Lastly, we conducted a leave-two-out (one responder and one non-responder) cross-validation on the following two FastMix models: <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2 + age,}\]</span> <span class="math display">\[\mbox{gene expression ~ cell proportions + response after dose 2.}\]</span> The <a href="https://github.com/terrysun0302/FastMix">FastMix</a> package also nicely provide a function <code>score_func()</code> that produces discriminant scores for “new” (left-out) subjects based on the the fitted (training) model.</p>
-<p>In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups</p>
+<p>In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups.</p>
 <div class="figure">
 <img src="images/age-is-a-factor.png" style="width:90.0%" />
 

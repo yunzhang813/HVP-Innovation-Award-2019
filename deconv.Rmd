@@ -176,6 +176,6 @@ $$\mbox{gene expression ~ cell proportions + response after dose 2 + age,}$$
 $$\mbox{gene expression ~ cell proportions + response after dose 2.}$$
 The [FastMix](https://github.com/terrysun0302/FastMix) package also nicely provide a function `score_func()` that produces discriminant scores for "new" (left-out) subjects based on the the fitted (training) model.
 
-In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups
+In this analysis (figure below), we identified that age is a factor that can impact the difference between the responders and non-responders, which is consistent with existing knowledge about the efficacy of vaccines in different age groups.
 
 ![](images/age-is-a-factor.png){width=90%}
